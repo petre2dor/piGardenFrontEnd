@@ -1,5 +1,20 @@
 extends layout
 
 block content
-    h1= title
-    p Welcome to #{title}
+	h1= title
+	p Welcome to #{title}!
+	//- div(style='width:45%; height: 45%')
+	canvas#myChart
+	
+	script.
+		var chartOptions = !{chartOptions};
+		var ctx = document.getElementById("myChart").getContext('2d');
+		console.log(chartOptions.data.datasets[0].data);
+		window.myLine = new Chart(ctx, chartOptions);
+
+		$.get('http://localhost:3002/getStats', function(data, status){
+			chartOptions.data.datasets[0].data = data.data;
+			window.myLine.update();
+		});
+		
+		
