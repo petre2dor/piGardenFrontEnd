@@ -5,19 +5,10 @@ var router  = express.Router();
 
 /* GET main page. */
 router.get('/', (req, res, next) => {
-    var data = [{
-                    x: 10,
-                    y: 1
-                },{
-                    x: 11,
-                    y: 2
-                },{
-                    x: 12,
-                    y: 1
-                }]
-
-    var chartOptions = {
+    let data = []
+    let chartOptions = {
         type: 'line',
+        fill: true,
         data: {
             datasets: [{
                 label: "Dataset with string point data",
@@ -48,6 +39,10 @@ router.get('/', (req, res, next) => {
                 }],
                 yAxes: [{
                     display: true,
+                    ticks: {
+                        min: 0,
+                        beginAtZero: true
+                    },
                     scaleLabel: {
                         display: true,
                         labelString: 'value'
@@ -72,9 +67,8 @@ router.get('/getStats', (req, res, next) => {
     }
 
     let ACRequest = new Request('localhost', 8080)
-    console.log(ACRequest);
     ACRequest
-    .get('/stats/3/2016-11-22T00:07:26')
+    .get('/stats/3/2016-11-27T00:00:00')
     .then(response => {
         data = processData(response.data)
         res.json({ data: data });
