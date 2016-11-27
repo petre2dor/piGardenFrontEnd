@@ -8,12 +8,12 @@ router.get('/', (req, res, next) => {
     let data = []
     let chartOptions = {
         type: 'line',
-        fill: true,
         data: {
             datasets: [{
                 label: "Dataset with string point data",
-                borderColor: 'rgb(255, 99, 132)',
-                fill: false,
+                borderColor: 'rgb(54, 162, 235)',
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 data: data,
             }]
         },
