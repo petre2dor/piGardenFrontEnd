@@ -11,9 +11,9 @@ router.get('/', (req, res, next) => {
 		data: {
 			datasets: [{
 				label: 'Temperature from DS18B20',
-				borderColor: 'rgb(54, 162, 235)',
+				borderColor: 'rgb(75, 192, 192)',
 				fill: true,
-				backgroundColor: 'rgba(54, 162, 235, 0.2)',
+				backgroundColor: 'rgba(75, 192, 192, 0.2)',
 				data: data,
 			},
 			{
