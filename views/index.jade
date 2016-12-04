@@ -12,9 +12,13 @@ block content
 		console.log(chartOptions.data.datasets[0].data);
 		window.myLine = new Chart(ctx, chartOptions);
 
-		$.get('http://localhost:3002/getStats', function(data, status){
+		$.get('http://localhost:3002/getStats/3', function(data, status){
 			chartOptions.data.datasets[0].data = data.data;
 			window.myLine.update();
 		});
 		
+		$.get('http://localhost:3002/getStats/1', function(data, status){
+			chartOptions.data.datasets[1].data = data.data;
+			window.myLine.update();
+		});
 		
