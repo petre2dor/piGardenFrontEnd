@@ -36,20 +36,12 @@ router.get('/', (req, res, next) => {
 					display: true,
 					time: {
 						displayFormats: {
-							day: 'MMM DD'
+							minute: 'HH:mm'
 						}
-					},
-					scaleLabel: {
-						display: true,
-						labelString: 'Date'
 					}
 				}],
 				yAxes: [{
 					display: true,
-					ticks: {
-						min: 0,
-						beginAtZero: true
-					},
 					scaleLabel: {
 						display: true,
 						labelString: 'value'
@@ -61,11 +53,13 @@ router.get('/', (req, res, next) => {
 	res.render('index', { title: 'Express', chartOptions: JSON.stringify(chartOptions) });
 });
 
-router.get('/getStats/:deviceId', (req, res, next) => {
-	function processData(raw_data){
+router.get('/getStats/:deviceId/:areaId/:type/:since', (req, res, next) => {
+    console.log('req: ', req.params);
+	processData = function(raw_data){
 		let data = []
 		raw_data.forEach(el => {
 			data.push({
+                label: moment(el.date).format('MMM D HH:mm'),
 				x: moment(el.date).format(),
 				y: el.value.toFixed(1)
 			})
@@ -73,13 +67,25 @@ router.get('/getStats/:deviceId', (req, res, next) => {
 		return data
 	}
 
-	let ACRequest = new Request('localhost', 8080)
+	let ACRequest = new Request('192.168.2.126', 3003)
+	// let ACRequest = new Request('localhost', 3003)
 	ACRequest
-	.get('/stats/'+req.params.deviceId+'/2016-11-27T00:00:00')
-	.then(response => {
-		data = processData(response.data)
-		res.json({ data: data });
-	})
+    	.post('/graphql', {"query": `{
+                              stats(
+                                device_id: `+req.params.deviceId+`,
+                                area_id: `+req.params.areaId+`,
+                                type: "`+req.params.type+`",
+                                since: "`+req.params.since+`"
+                              )
+                              {
+                                date,
+                                value
+                              }
+                            }`})
+    	.then(response => {
+    		data = processData(response.data.stats)
+    		res.json({ data: data});
+    	})
 });
 
 module.exports = router;

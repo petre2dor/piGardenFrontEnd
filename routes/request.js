@@ -50,40 +50,42 @@ class Request {
     }
 
     // returns a Promise
-    post (path, postData, callback) {
-        var postData = querystring.stringify(postData)
+    post (path, postData) {
+        var postData = JSON.stringify(postData)
 
-        var options = {
-            path: path,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': Buffer.byteLength(postData)
-            }
+        this.options.path    = path
+        this.options.method  = 'POST'
+        this.options.headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
         }
+
 
         // todo move this into a separate method (like getHttpRequest)
         // so we can mock in testing
         var body = ''
-        var req = http.request(options, (res) => {
-            res.setEncoding('utf8')
-            res.on('data', (chunk) => {
-                body += chunk
+        return new Promise( (resolve, reject) => {
+            var req = http.request(this.options, res => {
+                res.setEncoding('utf8')
+                res.on('data', (chunk) => {
+                    body += chunk
+                })
+                res.on('end', () => {
+                    var response = false
+                    try { response = JSON.parse(body) } catch (e) {}
+                    resolve(response)
+                })
             })
-            res.on('end', () => {
-                var response = false
-                try { response = JSON.parse(body) } catch (e) {}
-                callback(response)
+
+            req.on('error', (e) => {
+                console.log('problem with request:', e)
+                reject(e)
             })
-        })
 
-        req.on('error', (e) => {
-            console.log(`problem with request: ${e.message}`)
+            // write data to request body
+            req.write(postData)
+            req.end()
         })
-
-        // write data to request body
-        req.write(postData)
-        req.end()
     }
 }
 

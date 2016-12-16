@@ -3,22 +3,51 @@ extends layout
 block content
 	h1= title
 	p Welcome to #{title}!
-	//- div(style='width:45%; height: 45%')
-	canvas#myChart
+	
+	//- Temperature
+	input(type="text", name="deviceId1", value="3")#deviceId1 
+	input(type="text", name="deviceId2", value="6")#deviceId2 
+	input(type="text", name="since1", value="2016-12-16T19:24:00")#since1 
+	button(onClick="goTemp()")#go1 go! 
+	
+	canvas#tempChart
+	
+	//- Humidity
+	input(type="text", name="deviceId3", value="6")#deviceId3 
+	input(type="text", name="since2", value="2016-12-16T19:24:00")#since2
+	button(onClick="goHum()")#go2 go! 
+	
+	canvas#humChart
 	
 	script.
-		var chartOptions = !{chartOptions};
-		var ctx = document.getElementById("myChart").getContext('2d');
-		console.log(chartOptions.data.datasets[0].data);
-		window.myLine = new Chart(ctx, chartOptions);
-
-		$.get('http://localhost:3002/getStats/3', function(data, status){
-			chartOptions.data.datasets[0].data = data.data;
-			window.myLine.update();
-		});
+		var chartOptions1 = !{chartOptions};
+		var ctx = document.getElementById("tempChart").getContext('2d');
+		window.myLine1 = new Chart(ctx, chartOptions1);
+		goTemp = function(){
+			var since1 = document.getElementById('since1').value;
+			var deviceId1 = document.getElementById('deviceId1').value;			
+			$.get('http://localhost:3002/getStats/'+deviceId1+'/1/TEMPERATURE/'+since1, (data, status) => {
+				chartOptions1.data.datasets[0].data = data.data;
+				window.myLine1.update();
+			});
+			
+			var deviceId2 = document.getElementById('deviceId2').value;
+			$.get('http://localhost:3002/getStats/'+deviceId2+'/1/TEMPERATURE/'+since1, (data, status) => {
+				chartOptions1.data.datasets[1].data = data.data;
+				window.myLine1.update();
+			});
+		}
 		
-		$.get('http://localhost:3002/getStats/1', function(data, status){
-			chartOptions.data.datasets[1].data = data.data;
-			window.myLine.update();
-		});
+		var chartOptions2 = !{chartOptions};
+		var ctx = document.getElementById("humChart").getContext('2d');
+		window.myLine2 = new Chart(ctx, chartOptions2);
+		goHum = function(){
+			var since2 = document.getElementById('since2').value;
+			var deviceId3 = document.getElementById('deviceId3').value;			
+			$.get('http://localhost:3002/getStats/'+deviceId3+'/1/HUMIDITY/'+since2, (data, status) => {
+				chartOptions2.data.datasets[0].data = data.data;
+				window.myLine2.update();
+			});
+			
+		}
 		
